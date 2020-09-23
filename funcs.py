@@ -1,4 +1,25 @@
 import pandas as pd
+import file_handler as fh
+
+
+def find_coords(board):
+    boats = [1, 2, 3, 4]
+    lindex = [i for i in board.index]
+    lolumns = [i for i in board.columns]
+    boat_coords = []
+    to_json = {
+        4: [],
+        3: [],
+        2: [],
+        1: []
+    }
+    for i in lindex:
+        for c in lolumns:
+            if board.loc[i, c] in boats:
+                boat_coords.append([i, c, board.loc[i, c]])
+    for coord in boat_coords:
+        to_json[coord[2]].append(coord[0:2])
+    return to_json
 
 
 def adjacant_check(coord_list, board, lindex, lolumns):
@@ -61,7 +82,6 @@ def board_check(coord_list, board, ship_size):
             else:
                 boat.append([lindex[start + x], coord1[1]])
     if positions_allowed:
-        # return boat
         if adjacant_check(boat, board, lindex, lolumns):
             return boat
         else:
@@ -91,6 +111,7 @@ def place_ships():
     for _ in range(4):
         ship_1(board)
     print(f"{board}\nThis is your board!")
+    fh.serialize(find_coords(board))
 
 
 def ship_1(board):
@@ -106,6 +127,9 @@ def ship_1(board):
     except KeyError:
         print("Couldn't find that in the coordinate system\nTry again.")
         ship_1(board)
+    except IndexError:
+        print("Index error, you did something wrong")
+        ship_1(board)
     except TypeError:
         print("Faulty input\n")
         ship_1(board)
@@ -119,6 +143,9 @@ def ship_2(board):
         coords = coord_format(pos1, pos2)
         if place_boat(coords, board, 2) is False:
             ship_2(board)
+    except IndexError:
+        print("Index error, you tried to place boat outside of the board")
+        ship_2(board)
     except Exception as e:
         print(f"boat 2 err: {e}")
 
@@ -131,6 +158,9 @@ def ship_3(board):
         coords = coord_format(pos1, pos2)
         if place_boat(coords, board, 3) is False:
             ship_3(board)
+    except IndexError:
+        print("Index error, you tried to place boat outside of the board")
+        ship_3(board)
     except Exception as e:
         print(f"boat 3 err: {e}")
 
@@ -144,7 +174,7 @@ def ship_4(board):
         if place_boat(coords, board, 4) is False:
             ship_4(board)
     except IndexError:
-        print("Index error, you tried to place boat outside of coordsys")
+        print("Index error, you tried to place boat outside of the board")
         ship_4(board)
     except Exception as e:
         print(f"boat 4 err: {e}")
@@ -194,7 +224,7 @@ def coord_format(*coords):
 def input_handler():
     try:
         usr_in = input("\n: ")
-        return usr_in
+        return usr_in.lower()
     except Exception as e:
         print(f"Error: {e}")
 
@@ -202,7 +232,9 @@ def input_handler():
 def parse(arg):
     try:
         if "," in arg:
-            return tuple(arg.split(","))
+            args = tuple(arg.split(","))
+            args = [arg.strip() for arg in args]
+            return args
     except Exception as e:
         print(f"Error: {e}")
 
