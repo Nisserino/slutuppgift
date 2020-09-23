@@ -5,7 +5,16 @@ class Start_menue(cmd.Cmd):
     intro = "Welcome to the shipsweeper-game!"
     prompt = "Player: "
 
-    def do_see_player(self, arg):
+    def do_make_player(self, arg):
+        pass
+
+    def do_make_board(self, arg):
+        pass
+
+    def do_modify_board(self, arg):
+        pass
+
+    def do_see_players(self, arg):
         pass
 
     def do_see_boards(self, arg):

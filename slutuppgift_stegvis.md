@@ -53,8 +53,46 @@ Finished in the zoom group.
 
 Loop together a 10x10 dataframe, col a-j, rows 1-10
 fill all with 'O'
+    empty_list = []
+    for x in range 10 
+        row = []
+        for y in range 10
+            append 'O' to row
+        append row, as np_arr to empty list
+    make pandas dataframe from empty_list
+    add index 1-10
+    add cols a-j
 
 let player add boats, replace a,x-a,y with num(identifyer for boattype)
 save map to saves.json
+    if making new board
+    place_ships(board):
+        ship_4()
+        for i in range 2, ship_3
+        for i in range 3, ship_2
+        for i in range 4, ship_1
+
+    else
+    print board
+    ask for pos of ship you want to move
+    check if the cells around the chosen position contains a ship
+    if a cell does, do the check again
+    append all finds to a temp_list
+    when all cells are found, replace found positions stored in tmp_list with 'O'
+
+    use len(tmp_list) to figure out how big a ship player can put out
+    call relevant func 
+    if len(tmp_list) == 3:
+        ship_3()
+
+adjacent_check(coords, board, lindex, lolumns)
+    positions_allowed = True
+    my_list = [-1, 1]
+    for coord in coords
+        ind_start = lindex.index(coord[0])
+        col_start = lolumns.index(coord[1])
+        
+        
+
 
 
