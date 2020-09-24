@@ -2,10 +2,15 @@ import pandas as pd
 import file_handler as fh
 
 
-def find_coords(board):
-    boats = [1, 2, 3, 4]
+def list_ind_col(board):
     lindex = [i for i in board.index]
     lolumns = [i for i in board.columns]
+    return lindex, lolumns
+
+
+def find_coords(board):
+    boats = [1, 2, 3, 4]
+    lindex, lolumns = list_ind_col(board)
     boat_coords = []
     to_json = {
         4: [],
@@ -22,7 +27,8 @@ def find_coords(board):
     return to_json
 
 
-def adjacant_check(coord_list, board, lindex, lolumns):
+def adjacant_check(coord_list, board):
+    lindex, lolumns = list_ind_col(board)
     positions_allowed = True
     boats = [1, 2, 3, 4]
     try:
@@ -59,8 +65,7 @@ def board_check(coord_list, board, ship_size):
         list: if all coords of boat is allowed, list of coords returned
         bool: if boat has any unallowed coords, False is returned
     """
-    lindex = [i for i in board.index]  # numbers (list_index)
-    lolumns = [i for i in board.columns]  # letters (list_columns)
+    lindex, lolumns = list_ind_col(board)
     coord1 = coord_list[0]  # numbers
     coord2 = coord_list[1]  # letter
     positions_allowed = False
@@ -82,7 +87,7 @@ def board_check(coord_list, board, ship_size):
             else:
                 boat.append([lindex[start + x], coord1[1]])
     if positions_allowed:
-        if adjacant_check(boat, board, lindex, lolumns):
+        if adjacant_check(boat, board):
             return boat
         else:
             print("Boat in adjacant tile!")
@@ -209,7 +214,6 @@ def show_player_boards(player):
 def coord_format(*coords):
     list_coords = []
     try:
-        print(coords)
         for coord in coords:
             numbers = ''
             letter = ''
