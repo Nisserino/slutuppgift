@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 
+
 def player_exist(name):
     """Check if a save exists for player(name)
 
@@ -19,25 +20,57 @@ def player_exist(name):
         return True
 
 
-def serialize(coords):
+def init_player(name):
     try:
-        with open('saves/test.json', 'r') as f:
+        with open(f"saves/{name}.json", "w") as f:
+            base_json = {
+                        "boards": {
+                        },
+                        "stats": {
+                            "wins": {
+                                },
+                            "losses": {
+                                }
+                            }
+                        }
+            json.dump(base_json, f)
+
+        with open(f"saves/{name}.json", "r") as f:
             player = json.load(f)
-        with open("saves/test.json", "w") as test:
-            json.dump(, test)
+            print(player)
     except Exception as e:
-        print(e)
+        print(f"Error: {e}")
+        raise
 
 
-def deserialize(name):
+def serialize(coords, name):
     try:
-        with open(f'saves/{name}.json', 'r') as f:
+        with open(f"saves/{name}.json", "r") as f:
             player = json.load(f)
-            print(player["boards"]["level_one"])
-            player["boards"]["level_one"]['3'] = ["c3,c4"]
-            print(player["boards"]["level_one"])
+            player["boards"]["level_one"] = coords
+        with open(f"saves/{name}.json", "w") as test:
+            json.dump(player, test)
     except Exception as e:
         print(e)
+        raise
+
+
+def deserialize(board):
+    try:
+        with open("saves/gustav.json", "r") as f:
+            player = json.load(f)
+            board_pos = player["boards"]["level_one"]
+            for boat, i in enumerate(board_pos):
+                for boats in board_pos[i]:
+                    board_from_file(board, board_pos[i], i)
+    except Exception as e:
+        print(e)
+        raise
+
+
+def board_from_file(board, coord_list, ship_num):
+    for coord in coord_list:
+        board.loc[coord[0], coord[1]] = ship_num
 
 
 def build_playing_field():
@@ -59,5 +92,15 @@ def build_playing_field():
     return playing_field
 
 
+ship_coords = {
+                4: [['5', 'b'], ['5', 'c'], ['5', 'd'], ['5', 'e']],
+                3: [['1', 'j'], ['2', 'j'], ['3', 'j'], ['9', 'a'], ['9', 'b'], ['9', 'c']],
+                2: [['1', 'c'], ['2', 'c'], ['3', 'g'], ['3', 'h'], ['7', 'f'], ['8', 'f']],
+                1: [['1', 'a'], ['6', 'i'], ['9', 'g'], ['9', 'i']]
+                }
+
+
 test = build_playing_field()
-serialize(test)
+serialize(ship_coords, "gunhild")
+print("Board seialized \n\n\n\n\n")
+print(test)

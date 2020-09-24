@@ -19,6 +19,7 @@ def find_coords(board):
                 boat_coords.append([i, c, board.loc[i, c]])
     for coord in boat_coords:
         to_json[coord[2]].append(coord[0:2])
+    print(to_json)  # Remove me
     return to_json
 
 
@@ -59,8 +60,8 @@ def board_check(coord_list, board, ship_size):
         list: if all coords of boat is allowed, list of coords returned
         bool: if boat has any unallowed coords, False is returned
     """
-    lindex = [i for i in board.index]  # numbers
-    lolumns = [i for i in board.columns]  # letters
+    lindex = [i for i in board.index]  # numbers (list_index)
+    lolumns = [i for i in board.columns]  # letters (list_columns)
     coord1 = coord_list[0]  # numbers
     coord2 = coord_list[1]  # letter
     positions_allowed = False
@@ -181,8 +182,11 @@ def ship_4(board):
         raise
 
 
-def make_player():
-    pass
+def make_player(name):
+    if fh.player_exist(name) is False:
+        fh.init_player(name)
+    else:
+        print(f"Player: {name} already exists")
 
 
 def make_board(player):
@@ -197,6 +201,7 @@ def show_player_boards(player):
     pass
 
 
+# For future, if I want playfields bigger than alphabet, len(letter) <= 1
 def coord_format(*coords):
     list_coords = []
     try:
@@ -235,6 +240,8 @@ def parse(arg):
             args = tuple(arg.split(","))
             args = [arg.strip() for arg in args]
             return args
+        else:
+            return arg.strip().lower()
     except Exception as e:
         print(f"Error: {e}")
 
@@ -258,4 +265,5 @@ def build_playing_field():
     return playing_field
 
 
-place_ships()
+# place_ships()
+make_player("gunhild")
