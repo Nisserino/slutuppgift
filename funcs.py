@@ -19,7 +19,6 @@ def find_coords(board):
                 boat_coords.append([i, c, board.loc[i, c]])
     for coord in boat_coords:
         to_json[coord[2]].append(coord[0:2])
-    print(to_json)  # Remove me
     return to_json
 
 
@@ -102,8 +101,7 @@ def place_boat(coord_list, board, ship_size):
         return False
 
 
-def place_ships():
-    board = build_playing_field()  # Move to board init func(also make it)
+def place_ships(board):
     ship_4(board)
     for _ in range(2):
         ship_3(board)
@@ -112,7 +110,7 @@ def place_ships():
     for _ in range(4):
         ship_1(board)
     print(f"{board}\nThis is your board!")
-    fh.serialize(find_coords(board))
+    return board
 
 
 def ship_1(board):
@@ -185,12 +183,18 @@ def ship_4(board):
 def make_player(name):
     if fh.player_exist(name) is False:
         fh.init_player(name)
+        print(f"Created a player: {name}")
     else:
         print(f"Player: {name} already exists")
 
 
-def make_board(player):
-    pass
+def make_board(player_name, board_name):
+    if fh.player_exist(player_name):
+        board = build_playing_field()
+        place_ships(board)
+        fh.serialize_board(find_coords(board), player_name, board_name)
+    else:
+        print("Player does not exist, please create you profile first!")
 
 
 def show_players():
@@ -263,7 +267,3 @@ def build_playing_field():
                           'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'
                           ])
     return playing_field
-
-
-# place_ships()
-make_player("gunhild")

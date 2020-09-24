@@ -34,20 +34,16 @@ def init_player(name):
                             }
                         }
             json.dump(base_json, f)
-
-        with open(f"saves/{name}.json", "r") as f:
-            player = json.load(f)
-            print(player)
     except Exception as e:
         print(f"Error: {e}")
         raise
 
 
-def serialize(coords, name):
+def serialize_board(coords, name, board_name):
     try:
         with open(f"saves/{name}.json", "r") as f:
             player = json.load(f)
-            player["boards"]["level_one"] = coords
+            player["boards"][board_name] = coords
         with open(f"saves/{name}.json", "w") as test:
             json.dump(player, test)
     except Exception as e:
@@ -94,13 +90,13 @@ def build_playing_field():
 
 ship_coords = {
                 4: [['5', 'b'], ['5', 'c'], ['5', 'd'], ['5', 'e']],
-                3: [['1', 'j'], ['2', 'j'], ['3', 'j'], ['9', 'a'], ['9', 'b'], ['9', 'c']],
-                2: [['1', 'c'], ['2', 'c'], ['3', 'g'], ['3', 'h'], ['7', 'f'], ['8', 'f']],
+                3: [['1', 'j'], ['2', 'j'], ['3', 'j'], ['9', 'a'],
+                    ['9', 'b'], ['9', 'c']],
+                2: [['1', 'c'], ['2', 'c'], ['3', 'g'], ['3', 'h'],
+                    ['7', 'f'], ['8', 'f']],
                 1: [['1', 'a'], ['6', 'i'], ['9', 'g'], ['9', 'i']]
                 }
 
 
-test = build_playing_field()
-serialize(ship_coords, "gunhild")
-print("Board seialized \n\n\n\n\n")
-print(test)
+# test = build_playing_field()
+# serialize_board(ship_coords, "gunhild", "other_board")
