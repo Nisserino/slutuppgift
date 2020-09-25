@@ -11,17 +11,21 @@ class Game():
         self.turn = 1
 
     def shoot(self, player_num, coord):
+        go_again = False
         if self.hit(player_num, coord):
             print("Hit!")
             if self.sunk(coord, self.players[player_num]):
                 self.players[player_num].loc[coord[0], coord[1]] = "X"
+                print("You sunk the ship!")
             else:
                 self.players[player_num].loc[coord[0], coord[1]] = "x"
+                print("Ship is hit, but still afloat!")
+            go_again = True
         else:
             print("Miss!")
             self.players[player_num].loc[coord[0], coord[1]] = "o"
             self.turn_over()
-        print(self.players[player_num])
+        return go_again
 
     def hit(self, player_num, coord):
         if self.players[player_num].loc[coord[0], coord[1]].isdigit():
@@ -33,31 +37,48 @@ class Game():
         if board.loc[hit_coord[0], hit_coord[1]] == "1":
             return True
         elif board.loc[hit_coord[0], hit_coord[1]] == "2":
-            pass
+            return self.func_1([hit_coord], board, 2)
         elif board.loc[hit_coord[0], hit_coord[1]] == "3":
-            pass
+            return self.func_1([hit_coord], board_2, 3)
         elif board.loc[hit_coord[0], hit_coord[1]] == "4":
-            self.check_adj(hit_coord, board, 4)
+            return self.func_1([hit_coord], board, 4)
 
-    # unfinished, rework coming up!
-    def check_adj(self, hit_coord, board, ship_size):
+    def func_1(self, hit_coord, board, ship_size):
+        ship_coords = []
+        for coord in hit_coord:
+            ship_coords.append(coord)
+        if len(ship_coords) < ship_size:
+            boat_coords = []
+            for coord in ship_coords:
+                boat_coords.append(self.func_2(coord, board))
+            for lists in boat_coords:
+                for coord in lists:
+                    if coord not in ship_coords:
+                        ship_coords.append(coord)
+        if len(ship_coords) != ship_size:
+            self.func_1(ship_coords, board, ship_size)
+        else:
+            sunk = True
+            for coord in ship_coords:
+                if board.loc[coord[0], coord[1]].isdigit():
+                    sunk = False
+            return sunk
+
+    def func_2(self, coord, board):
+        hits = []
         check = ["2", "3", "4", "x"]
         lindex, lolumns = f.list_ind_col(board)
-        ship = [hit_coord]
-        while len(ship) < ship_size:
-            i_start = lindex.index(ship[-1][0])
-            c_start = lolumns.index(ship[-1][1])
-            to_ship = []
-            if board.loc[lindex[i_start - 1], lolumns[c_start]] in check:
-                to_ship = [lindex[i_start - 1], lolumns[c_start]]
-            elif board.loc[lindex[i_start], lolumns[c_start - 1]] in check:
-                to_ship = [lindex[i_start], lolumns[c_start - 1]]
-            elif board.loc[lindex[i_start + 1], lolumns[c_start]] in check:
-                to_ship = [lindex[i_start + 1], lolumns[c_start]]
-            elif board.loc[lindex[i_start], lolumns[c_start + 1]] in check:
-                to_ship = [lindex[i_start], lolumns[c_start + 1]]
-            if to_ship not in ship:
-                ship.append(to_ship)
+        i_start = lindex.index(coord[0])
+        c_start = lolumns.index(coord[1])
+        if board.loc[lindex[i_start - 1], lolumns[c_start]] in check:
+            hits.append([lindex[i_start - 1], lolumns[c_start]])
+        if board.loc[lindex[i_start], lolumns[c_start - 1]] in check:
+            hits.append([lindex[i_start], lolumns[c_start - 1]])
+        if board.loc[lindex[i_start + 1], lolumns[c_start]] in check:
+            hits.append([lindex[i_start + 1], lolumns[c_start]])
+        if board.loc[lindex[i_start], lolumns[c_start + 1]] in check:
+            hits.append([lindex[i_start], lolumns[c_start + 1]])
+        return hits
 
     def turn_over(self):
         self.turn += 1
