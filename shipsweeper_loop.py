@@ -1,4 +1,5 @@
 import cmd
+import funcs as f
 
 
 class Start_menue(cmd.Cmd):
@@ -6,7 +7,8 @@ class Start_menue(cmd.Cmd):
     prompt = "Player: "
 
     def do_make_player(self, arg):
-        pass
+        'Create a player'
+        f.make_player(arg)
 
     def do_make_board(self, arg):
         pass
@@ -35,3 +37,6 @@ class Game_loop(cmd.Cmd):
     def do_quit(self, arg):
         'Exit the game'
         return True
+
+
+Start_menue().cmdloop()

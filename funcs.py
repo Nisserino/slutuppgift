@@ -27,6 +27,7 @@ def find_coords(board):
     return to_json
 
 
+# Reomve boats, in if, check .isdigt() instead
 def adjacant_check(coord_list, board):
     lindex, lolumns = list_ind_col(board)
     positions_allowed = True

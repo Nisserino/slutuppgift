@@ -51,14 +51,16 @@ def serialize_board(coords, name, board_name):
         raise
 
 
-def deserialize(board):
+def deserialize(name, board_name):
+    board = build_playing_field()
     try:
-        with open("saves/gustav.json", "r") as f:
+        with open(f"saves/{name}.json", "r") as f:
             player = json.load(f)
-            board_pos = player["boards"]["level_one"]
+            board_pos = player["boards"][board_name]
             for boat, i in enumerate(board_pos):
                 for boats in board_pos[i]:
                     board_from_file(board, board_pos[i], i)
+        return board
     except Exception as e:
         print(e)
         raise
@@ -67,6 +69,7 @@ def deserialize(board):
 def board_from_file(board, coord_list, ship_num):
     for coord in coord_list:
         board.loc[coord[0], coord[1]] = ship_num
+    return board
 
 
 def build_playing_field():
