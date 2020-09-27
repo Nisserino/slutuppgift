@@ -10,22 +10,29 @@ class Game():
         self.display_boards = [display_1, display_2]
         self.turn = 1
 
+    def shoot_(self, prompt, arg):
+        coord = f.coord_format(arg)
+        if "1" in prompt:
+            self.shoot(0, coord)
+        else:
+            self.shoot(1, coord)
+
     def shoot(self, player_num, coord):
-        go_again = False
         if self.hit(player_num, coord):
-            print("Hit!")
             if self.sunk(coord, self.players[player_num]):
                 self.players[player_num].loc[coord[0], coord[1]] = "X"
                 print("You sunk the ship!")
             else:
                 self.players[player_num].loc[coord[0], coord[1]] = "x"
                 print("Ship is hit, but still afloat!")
-            go_again = True
         else:
             print("Miss!")
             self.players[player_num].loc[coord[0], coord[1]] = "o"
             self.turn_over()
-        return go_again
+        print(
+            f"-- player 1 --\n{self.players[0]}\n"
+            f"-- player 2 --\n{self.players[1]}"
+            )
 
     def hit(self, player_num, coord):
         if self.players[player_num].loc[coord[0], coord[1]].isdigit():
@@ -39,7 +46,7 @@ class Game():
         elif board.loc[hit_coord[0], hit_coord[1]] == "2":
             return self.func_1([hit_coord], board, 2)
         elif board.loc[hit_coord[0], hit_coord[1]] == "3":
-            return self.func_1([hit_coord], board_2, 3)
+            return self.func_1([hit_coord], board, 3)
         elif board.loc[hit_coord[0], hit_coord[1]] == "4":
             return self.func_1([hit_coord], board, 4)
 
@@ -58,11 +65,16 @@ class Game():
         if len(ship_coords) != ship_size:
             self.func_1(ship_coords, board, ship_size)
         else:
-            sunk = True
+            sunk = []
             for coord in ship_coords:
                 if board.loc[coord[0], coord[1]].isdigit():
-                    sunk = False
-            return sunk
+                    sunk.append(1)
+                else:
+                    sunk.append(0)
+            if sunk.count(1) == 1:
+                return True
+            else:
+                return False
 
     def func_2(self, coord, board):
         hits = []
@@ -84,7 +96,7 @@ class Game():
         self.turn += 1
 
 
-board_1 = fh.deserialize("gunhild", "feltet")
-board_2 = fh.deserialize("pc", "pog")
-test_game = Game(board_1, board_2)
-test_game.shoot(0, ["1", "b"])
+# board_1 = fh.deserialize("gunhild", "feltet")
+# board_2 = fh.deserialize("pc", "pog")
+# test_game = Game(board_1, board_2)
+# test_game.shoot(0, ["1", "b"])
