@@ -22,21 +22,25 @@ class Game():
             self.shoot(0, coord)  # -//-
 
     def shoot(self, player_num, coord):
-        if self.hit(player_num, coord):
-            if self.sunk(coord, self.players[player_num]):
-                self.players[player_num].loc[coord[0], coord[1]] = "X"
-                self.display_boards[player_num].loc[coord[0], coord[1]] = "X"
-                self.win_check(player_num)
-                print("You sunk the ship!")
-            else:
-                self.players[player_num].loc[coord[0], coord[1]] = "x"
-                self.display_boards[player_num].loc[coord[0], coord[1]] = "x"
-                print("Ship is hit, but still afloat!")
+        target = self.players[player_num].loc[coord[0], coord[1]]
+        if target == "o" or target == "x" or target == "X":
+            print("You have already shot there, shoot elsewhere!")
         else:
-            print("Miss!")
-            self.players[player_num].loc[coord[0], coord[1]] = "o"
-            self.display_boards[player_num].loc[coord[0], coord[1]] = "o"
-            self.turn_over()
+            if self.hit(player_num, coord):
+                if self.sunk(coord, self.players[player_num]):
+                    self.players[player_num].loc[coord[0], coord[1]] = "X"
+                    self.display_boards[player_num].loc[coord[0], coord[1]] = "X"
+                    self.win_check(player_num)
+                    print("You sunk the ship!")
+                else:
+                    self.players[player_num].loc[coord[0], coord[1]] = "x"
+                    self.display_boards[player_num].loc[coord[0], coord[1]] = "x"
+                    print("Ship is hit, but still afloat!")
+            else:
+                print("Miss!")
+                self.players[player_num].loc[coord[0], coord[1]] = "o"
+                self.display_boards[player_num].loc[coord[0], coord[1]] = "o"
+                self.turn_over()
         # Debug printing
         print(
             f"-- player 1 --\n{self.players[0]}\n"
@@ -49,7 +53,8 @@ class Game():
         #     )
 
     def hit(self, player_num, coord):
-        if self.players[player_num].loc[coord[0], coord[1]].isdigit():
+        coord = self.players[player_num].loc[coord[0], coord[1]]
+        if coord.isdigit():
             self.hp[player_num] -= 1
             return True
         else:
@@ -120,17 +125,17 @@ class Bot_player:
     def __init__(self):
         self.start()
         self.last_hit = str
-        self.board = ""
+        self.attackable = []
 
     def start(self):
         name = "pc"
         boards = fh.player_boards(name)
-        board = boards[random.randint(0, len(boards))]
+        board = boards[random.randint(0, len(boards) - 1)]
         self.board = fh.deserialize(name, board)
 
-    def shoot_coord():
-        pass
-
+    def fire(self):
+        move = random.randint(0, len(self.attackable))
+        
     def shootable_coords():
         pass
 

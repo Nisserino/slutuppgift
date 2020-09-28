@@ -73,10 +73,9 @@ def player_boards(name):
             player = json.load(f)
             for board in player["boards"]:
                 boards.append(board)
-        print(boards)
+        return boards
     except Exception as e:
         print(f"Error: {e}")
-        raise
 
 
 def board_from_file(board, coord_list, ship_num):

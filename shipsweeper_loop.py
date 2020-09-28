@@ -28,13 +28,15 @@ class Start_menue(cmd.Cmd):
 
     def do_start_pve(self, arg):
         'Start a game vs computer: player_name, player_board'
-        pass
+        farg = ("gunhild", "feltet")
+        pve(farg)
+        Pve_loop().cmdloop()
 
     def do_start_pvp(self, arg):
         'Start game: player1, board1, player2, board2'
         arga = ("gunhild","feltet","gustav","level_one")
         pvp(arga)
-        Game_loop().cmdloop()
+        Pvp_loop().cmdloop()
 
     def do_quit(self, arg):
         'Exit the game'
@@ -43,24 +45,23 @@ class Start_menue(cmd.Cmd):
 
 def pve(arg):
     player1, board1 = arg
-    
-    Game_loop.game = ff.Game(board1, xx, False)
+    board1 = fh.deserialize(player1, board1)
+    Pve_loop.bot = ff.Bot_player()
+    board2 = Pve_loop.bot.board
+    Pve_loop.game = ff.Game(board1, board2, False)
 
 
 def pvp(arg):
     player1, board1, player2, board2 = arg
     board1 = fh.deserialize(player1, board1)
     board2 = fh.deserialize(player2, board2)
-    Game_loop.game = ff.Game(board1, board2, True)
+    Pvp_loop.game = ff.Game(board1, board2, True)
 
 
-class Game_loop(cmd.Cmd):
+class Pvp_loop(cmd.Cmd):
     intro = "Game starts!"
     prompt = "Player1: "
     game = object
-
-    def do_start(self, arg):
-        self.turn_check()
 
     def do_shoot(self, arg):
         self.game.shoot_who(self.prompt, arg)
@@ -71,6 +72,32 @@ class Game_loop(cmd.Cmd):
             self.prompt = "player1: "
         else:
             self.prompt = "player2: "
+        if self.game.game_over is True:
+            print("something")
+
+
+class Pve_loop(cmd.Cmd):
+    intro = "aaa"
+    prompt = "Player1: "
+    game = object
+    bot = object
+
+    def do_shoot(self, arg):
+        self.game.shoot_who(self.prompt, arg)
+        self.turn_check()
+
+    def turn_check(self):
+        if self.game.turn % 2 != 0:
+            self.prompt = "player1: "
+        else:
+            self.prompt = "player2: "
+            bot_turn()
+    
+    def bot_turn(self):
+        self.game.shoot_who(self.prompt, self.bot.fire())
+        
+
+
 
 
 Start_menue().cmdloop()
