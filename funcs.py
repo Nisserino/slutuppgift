@@ -194,7 +194,8 @@ def make_player(name):
         print(f"Player: {name} already exists")
 
 
-def make_board(player_name, board_name):
+def make_board(arg):
+    player_name, board_name = parse(arg)
     if fh.player_exist(player_name):
         board = build_playing_field()
         place_ships(board)

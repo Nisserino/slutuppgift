@@ -66,12 +66,26 @@ def deserialize(name, board_name):
         raise
 
 
+def player_boards(name):
+    try:
+        boards = []
+        with open(f"saves/{name}.json", "r") as f:
+            player = json.load(f)
+            for board in player["boards"]:
+                boards.append(board)
+        print(boards)
+    except Exception as e:
+        print(f"Error: {e}")
+        raise
+
+
 def board_from_file(board, coord_list, ship_num):
     for coord in coord_list:
         board.loc[coord[0], coord[1]] = ship_num
     return board
 
 
+# Use func from funcs.py instead
 def build_playing_field():
     arr = []
     for x in range(10):
@@ -91,6 +105,7 @@ def build_playing_field():
     return playing_field
 
 
+# Remove this, if not needed for "hardcoded" pc coords
 ship_coords = {
                 4: [['5', 'b'], ['5', 'c'], ['5', 'd'], ['5', 'e']],
                 3: [['1', 'j'], ['2', 'j'], ['3', 'j'], ['9', 'a'],
@@ -103,3 +118,4 @@ ship_coords = {
 
 # test = build_playing_field()
 # serialize_board(ship_coords, "gunhild", "other_board")
+player_boards("pc")

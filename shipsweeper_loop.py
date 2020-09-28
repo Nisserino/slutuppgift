@@ -14,6 +14,7 @@ class Start_menue(cmd.Cmd):
 
     def do_make_board(self, arg):
         'Make a board for an existing player: player_name, board_name'
+        f.make_board(arg)
 
     def do_modify_board(self, arg):
         pass
@@ -22,12 +23,17 @@ class Start_menue(cmd.Cmd):
         pass
 
     def do_see_boards(self, arg):
+        'See which boards a player has: see_boards player_name'
+        fh.player_boards(arg)
+
+    def do_start_pve(self, arg):
+        'Start a game vs computer: player_name, player_board'
         pass
 
-    def do_start_game(self, arg):
+    def do_start_pvp(self, arg):
         'Start game: player1, board1, player2, board2'
         arga = ("gunhild","feltet","gustav","level_one")
-        fake_init(arga)
+        pvp(arga)
         Game_loop().cmdloop()
 
     def do_quit(self, arg):
@@ -35,31 +41,17 @@ class Start_menue(cmd.Cmd):
         return True
 
 
-class player_1(cmd.Cmd):
-    intro = "Let's blow up some ships!"
-    prompt = "Player1: "
-
-    def do_shoot(self, arg):
-        pass
-
-    def do_quit(self, arg):
-        'Exit the game'
-        return True
+def pve(arg):
+    player1, board1 = arg
+    
+    Game_loop.game = ff.Game(board1, xx, False)
 
 
-class player_2(cmd.Cmd):
-    prompt = "Player2: "
-
-    def do_shoot(self, arg):
-        'shoot at coordinate, ie: a1,b1'
-        pass
-
-
-def fake_init(arg):
+def pvp(arg):
     player1, board1, player2, board2 = arg
     board1 = fh.deserialize(player1, board1)
     board2 = fh.deserialize(player2, board2)
-    Game_loop.game = ff.Game(board1, board2)
+    Game_loop.game = ff.Game(board1, board2, True)
 
 
 class Game_loop(cmd.Cmd):
@@ -71,7 +63,7 @@ class Game_loop(cmd.Cmd):
         self.turn_check()
 
     def do_shoot(self, arg):
-        self.game.shoot_(self.prompt, arg)
+        self.game.shoot_who(self.prompt, arg)
         self.turn_check()
 
     def turn_check(self):
