@@ -17,46 +17,32 @@ class Game():
     def shoot_who(self, prompt, arg):
         coord = f.coord_format(arg)
         if "1" in prompt:
-            self.shoot(1, coord)  # Shoot other player
+            self.check_shot(1, coord)  # Shoot other player
         else:
-            self.shoot(0, coord)  # -//-
+            self.check_shot(0, coord)  # -//-
 
-    # Break apart to relevant funcs
-    def shoot(self, player_num, coord):
+    def check_shot(self, player, coord):
         try:
-            target = self.players[player_num].loc[coord[0], coord[1]]
+            target = self.players[player].loc[coord[0], coord[1]]
             if target == "o" or target == "x" or target == "X":
                 print("You have already shot there, shoot elsewhere!")
             else:
-                if self.hit(player_num, coord):
+                self.check_hit(player, coord)
+        except Exception as e:  # KeyError and Index error
+            print(
+                f"Error: {e}\n"
+                "You probably wrote the coords badly\nTry again."
+                )
 
-                    if self.sunk(coord, self.players[player_num]):
-
-                        self.players[player_num].loc[coord[0], coord[1]] = "X"
-                        self.display_boards[player_num].loc[coord[0], coord[1]] = "X"
-                        self.win_check(player_num)
-                        print("You sunk the ship!")
-                    else:
-                        self.players[player_num].loc[coord[0], coord[1]] = "x"
-                        self.display_boards[player_num].loc[coord[0], coord[1]] = "x"
-                        print("Ship is hit, but still afloat!")
-                else:
-                    print("Miss!")
-                    self.players[player_num].loc[coord[0], coord[1]] = "o"
-                    self.display_boards[player_num].loc[coord[0], coord[1]] = "o"
-                    self.turn_over()
-        except KeyError:
-            print("You probably wrote the coords badly\nTry again.")
-        # Debug printing
-        # print(
-        #     f"-- player 1 --\n{self.players[0]}\n"
-        #     f"-- player 2 --\n{self.players[1]}"
-        #     )
-        # 'Real' printing
-        print(
-            f"\n-- Player 1 --\n{self.display_boards[0]}\n"
-            f"-- Player 2 --\n{self.display_boards[1]}"
-            )
+    def check_hit(self, player, coord):
+        if self.hit(player, coord):
+            self.check_afloat(player, coord)
+        else:
+            print("Miss!")
+            self.players[player].loc[coord[0], coord[1]] = "o"
+            self.display_boards[player].loc[coord[0], coord[1]] = "o"
+            self.turn_over()
+        self.show_boards()
 
     def hit(self, player_num, coord):
         coord = self.players[player_num].loc[coord[0], coord[1]]
@@ -66,31 +52,43 @@ class Game():
         else:
             return False
 
-    def sunk(self, hit_coord, board):
+    def check_afloat(self, player, coord):
+        if self.check_boat(coord, self.players[player]):
+            self.players[player].loc[coord[0], coord[1]] = "X"
+            self.display_boards[player].loc[coord[0], coord[1]] = "X"
+            self.win_check(player)
+            print("You sunk the ship!")
+        else:
+            self.players[player].loc[coord[0], coord[1]] = "x"
+            self.display_boards[player].loc[coord[0], coord[1]] = "x"
+            print("Ship is hit, but still afloat!")
+
+    def check_boat(self, hit_coord, board):
+        # Get shipsize, if ship is a 1, it has sunk (return True)
         if board.loc[hit_coord[0], hit_coord[1]] == "1":
             return True
         elif board.loc[hit_coord[0], hit_coord[1]] == "2":
-            return self.func_1([hit_coord], board, 2)
+            return self.find_boat([hit_coord], board, 2)
         elif board.loc[hit_coord[0], hit_coord[1]] == "3":
-            return self.func_1([hit_coord], board, 3)
+            return self.find_boat([hit_coord], board, 3)
         elif board.loc[hit_coord[0], hit_coord[1]] == "4":
-            return self.func_1([hit_coord], board, 4)
+            return self.find_boat([hit_coord], board, 4)
 
-    def func_1(self, hit_coord, board, ship_size):
+    def find_boat(self, hit_coord, board, ship_size):
         ship_coords = []
         for coord in hit_coord:
             ship_coords.append(coord)
         while len(ship_coords) < ship_size:
             boat_coords = []
             for coord in ship_coords:
-                boat_coords.append(self.func_2(coord, board))
+                boat_coords.append(self.find_adjacant(coord, board))
             for lists in boat_coords:
                 for coord in lists:
                     if coord not in ship_coords:
                         ship_coords.append(coord)
-        return self.func_3(ship_coords, board)
+        return self.boat_dead(ship_coords, board)
 
-    def func_2(self, coord, board):
+    def find_adjacant(self, coord, board):
         hits = []
         check = ["2", "3", "4", "x"]
         lindex, lolumns = f.list_ind_col(board)
@@ -109,7 +107,7 @@ class Game():
             pass
         return hits
 
-    def func_3(self, ship_coords, board):
+    def boat_dead(self, ship_coords, board):
         sunk = []
         for coord in ship_coords:
             if board.loc[coord[0], coord[1]].isdigit():
@@ -121,13 +119,18 @@ class Game():
         else:
             return False
 
+    def show_boards(self):
+        print(
+            f"-- Player 1 -- \n{self.display_boards[0]}\n"
+            f"-- Player 2 -- \n{self.display_boards[1]}"
+        )
+
     def turn_over(self):
         self.turn += 1
 
     def win_check(self, player_num):
         if self.hp[player_num] == 0:
             self.game_over = True
-        pass
 
 
 class Bot_player:
