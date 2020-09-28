@@ -21,36 +21,42 @@ class Game():
         else:
             self.shoot(0, coord)  # -//-
 
+    # Break apart to relevant funcs
     def shoot(self, player_num, coord):
-        target = self.players[player_num].loc[coord[0], coord[1]]
-        if target == "o" or target == "x" or target == "X":
-            print("You have already shot there, shoot elsewhere!")
-        else:
-            if self.hit(player_num, coord):
-                if self.sunk(coord, self.players[player_num]):
-                    self.players[player_num].loc[coord[0], coord[1]] = "X"
-                    self.display_boards[player_num].loc[coord[0], coord[1]] = "X"
-                    self.win_check(player_num)
-                    print("You sunk the ship!")
-                else:
-                    self.players[player_num].loc[coord[0], coord[1]] = "x"
-                    self.display_boards[player_num].loc[coord[0], coord[1]] = "x"
-                    print("Ship is hit, but still afloat!")
+        try:
+            target = self.players[player_num].loc[coord[0], coord[1]]
+            if target == "o" or target == "x" or target == "X":
+                print("You have already shot there, shoot elsewhere!")
             else:
-                print("Miss!")
-                self.players[player_num].loc[coord[0], coord[1]] = "o"
-                self.display_boards[player_num].loc[coord[0], coord[1]] = "o"
-                self.turn_over()
+                if self.hit(player_num, coord):
+
+                    if self.sunk(coord, self.players[player_num]):
+
+                        self.players[player_num].loc[coord[0], coord[1]] = "X"
+                        self.display_boards[player_num].loc[coord[0], coord[1]] = "X"
+                        self.win_check(player_num)
+                        print("You sunk the ship!")
+                    else:
+                        self.players[player_num].loc[coord[0], coord[1]] = "x"
+                        self.display_boards[player_num].loc[coord[0], coord[1]] = "x"
+                        print("Ship is hit, but still afloat!")
+                else:
+                    print("Miss!")
+                    self.players[player_num].loc[coord[0], coord[1]] = "o"
+                    self.display_boards[player_num].loc[coord[0], coord[1]] = "o"
+                    self.turn_over()
+        except KeyError:
+            print("You probably wrote the coords badly\nTry again.")
         # Debug printing
-        print(
-            f"-- player 1 --\n{self.players[0]}\n"
-            f"-- player 2 --\n{self.players[1]}"
-            )
-        # 'Real' printing
         # print(
-        #     f"-- Player 1 --\n{self.display_boards[0]}"
-        #     f"-- Player 2 --\n{self.display_boards[1]}"
+        #     f"-- player 1 --\n{self.players[0]}\n"
+        #     f"-- player 2 --\n{self.players[1]}"
         #     )
+        # 'Real' printing
+        print(
+            f"\n-- Player 1 --\n{self.display_boards[0]}\n"
+            f"-- Player 2 --\n{self.display_boards[1]}"
+            )
 
     def hit(self, player_num, coord):
         coord = self.players[player_num].loc[coord[0], coord[1]]
@@ -90,14 +96,17 @@ class Game():
         lindex, lolumns = f.list_ind_col(board)
         i_start = lindex.index(coord[0])
         c_start = lolumns.index(coord[1])
-        if board.loc[lindex[i_start - 1], lolumns[c_start]] in check:
-            hits.append([lindex[i_start - 1], lolumns[c_start]])
-        if board.loc[lindex[i_start], lolumns[c_start - 1]] in check:
-            hits.append([lindex[i_start], lolumns[c_start - 1]])
-        if board.loc[lindex[i_start + 1], lolumns[c_start]] in check:
-            hits.append([lindex[i_start + 1], lolumns[c_start]])
-        if board.loc[lindex[i_start], lolumns[c_start + 1]] in check:
-            hits.append([lindex[i_start], lolumns[c_start + 1]])
+        try:
+            if board.loc[lindex[i_start - 1], lolumns[c_start]] in check:
+                hits.append([lindex[i_start - 1], lolumns[c_start]])
+            if board.loc[lindex[i_start], lolumns[c_start - 1]] in check:
+                hits.append([lindex[i_start], lolumns[c_start - 1]])
+            if board.loc[lindex[i_start + 1], lolumns[c_start]] in check:
+                hits.append([lindex[i_start + 1], lolumns[c_start]])
+            if board.loc[lindex[i_start], lolumns[c_start + 1]] in check:
+                hits.append([lindex[i_start], lolumns[c_start + 1]])
+        except IndexError:
+            pass
         return hits
 
     def func_3(self, ship_coords, board):
@@ -123,9 +132,9 @@ class Game():
 
 class Bot_player:
     def __init__(self):
-        self.start()
-        self.last_hit = str
-        self.attackable = []
+        self.start()  # Picks a random board from user pc
+        self.shootable_coords()  # initializes list of attackable coords
+        self.last_hit = str  # Store last hit, unless ship sunk
 
     def start(self):
         name = "pc"
@@ -134,16 +143,20 @@ class Bot_player:
         self.board = fh.deserialize(name, board)
 
     def fire(self):
-        move = random.randint(0, len(self.attackable))
-        
-    def shootable_coords():
-        pass
+        move = random.randint(0, len(self.attackable) - 1)
+        choice = self.attackable[move]
+        del self.attackable[move]
+        return choice
+
+    def shootable_coords(self):
+        df = fh.build_playing_field()
+        lolumns, lindex = f.list_ind_col(df)
+        self.attackable = []
+        for i in lindex:
+            for c in lolumns:
+                coord = [i, c]
+                if coord not in self.attackable:
+                    self.attackable.append(coord)
 
     def smart_shot():
         pass
-
-
-# board_1 = fh.deserialize("gunhild", "feltet")
-# board_2 = fh.deserialize("pc", "pog")
-# test_game = Game(board_1, board_2)
-# test_game.shoot(0, ["1", "b"])

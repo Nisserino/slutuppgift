@@ -6,7 +6,7 @@ import file_handler as fh
 
 class Start_menue(cmd.Cmd):
     intro = "Welcome to the shipsweeper-game!"
-    prompt = "Player: "
+    prompt = "Main menue: "
 
     def do_make_player(self, arg):
         'Create a player'
@@ -24,7 +24,7 @@ class Start_menue(cmd.Cmd):
 
     def do_see_boards(self, arg):
         'See which boards a player has: see_boards player_name'
-        fh.player_boards(arg)
+        print(fh.player_boards(arg))
 
     def do_start_pve(self, arg):
         'Start a game vs computer: player_name, player_board'
@@ -65,15 +65,34 @@ class Pvp_loop(cmd.Cmd):
 
     def do_shoot(self, arg):
         self.game.shoot_who(self.prompt, arg)
+        self.after_move_check()
+        return self.game_over()
+
+    def do_hp(self, arg):
+        'Show remaining hp for both players'
+        print(
+            f"Player 1 has {self.game.hp[0]} hp left\n"
+            f"Player 2 has {self.game.hp[1]} hp left"
+            )
+
+    def after_move_check(self):
         self.turn_check()
+        self.game_over()
 
     def turn_check(self):
         if self.game.turn % 2 != 0:
             self.prompt = "player1: "
         else:
             self.prompt = "player2: "
-        if self.game.game_over is True:
-            print("something")
+
+    def game_over(self):
+        if self.game.game_over:
+            End_screen(self.prompt.replace(":", ""), self.game).cmdloop()
+            return True
+
+    def do_quit(self, arg):
+        'Exit'
+        return True
 
 
 class Pve_loop(cmd.Cmd):
@@ -83,7 +102,20 @@ class Pve_loop(cmd.Cmd):
     bot = object
 
     def do_shoot(self, arg):
+        'Shoot at other player by coordinate: shoot a1'
         self.game.shoot_who(self.prompt, arg)
+        self.after_move_check()
+        return self.game_over()
+        # If game_over, it will return True, which breaks the loop
+
+    def do_hp(self, arg):
+        'Show remaining hp for both players'
+        print(
+            f"Player 1 has {self.game.hp[0]} hp left\n"
+            f"Player 2 has {self.game.hp[1]} hp left"
+            )
+
+    def after_move_check(self):
         self.turn_check()
 
     def turn_check(self):
@@ -91,13 +123,34 @@ class Pve_loop(cmd.Cmd):
             self.prompt = "player1: "
         else:
             self.prompt = "player2: "
-            bot_turn()
-    
+            self.bot_turn()
+
     def bot_turn(self):
-        self.game.shoot_who(self.prompt, self.bot.fire())
-        
+        bot_choi = self.bot.fire()
+        self.do_shoot(bot_choi)
+        print(bot_choi[0] + bot_choi[1])
+
+    def game_over(self):
+        if self.game.game_over:
+            End_screen(self.prompt.replace(":", ""), self.game).cmdloop()
+            return True
 
 
+class End_screen(cmd.Cmd):
+    intro = str
+    prompt = str
+
+    def __init__(self, winner, game):
+        super().__init__()
+        self.prompt = f"🟉 {winner.strip()} 🟉 : "
+        self.game = game
+        self.intro = (
+            f"Congratulations, {winner.strip()}\n"
+            f"{winner.strip()} won in {self.game.turn} turns!\n"
+        )
+
+    def do_quit(self, arg):
+        return True
 
 
 Start_menue().cmdloop()
