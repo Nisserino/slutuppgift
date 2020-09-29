@@ -16,12 +16,6 @@ class Start_menue(cmd.Cmd):
         'Make a board for an existing player: player_name, board_name'
         f.make_board(arg)
 
-    def do_modify_board(self, arg):
-        pass
-
-    def do_see_players(self, arg):
-        pass
-
     def do_see_boards(self, arg):
         'See which boards a player has: see_boards player_name'
         print(fh.player_boards(arg))
