@@ -16,7 +16,7 @@ Write ```help show_boards``` or ```? show_boards```
 
 ## How to install
 ---
-Make sure you have python installed  
+Make sure you have python installed as well as pandas  
 Clone this repository, and you're done!  
 >Note: If you're not running unix, there might be a problem with saving anything, which sadly makes the game unplayable.
 ## How to run
