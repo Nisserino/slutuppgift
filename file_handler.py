@@ -1,5 +1,6 @@
 import json
-import pandas as pd
+import csv
+import funcs
 
 
 def player_exist(name):
@@ -52,7 +53,7 @@ def serialize_board(coords, name, board_name):
 
 
 def deserialize(name, board_name):
-    board = build_playing_field()
+    board = funcs.build_playing_field()
     try:
         with open(f"saves/{name}.json", "r") as f:
             player = json.load(f)
@@ -84,37 +85,7 @@ def board_from_file(board, coord_list, ship_num):
     return board
 
 
-# Use func from funcs.py instead
-def build_playing_field():
-    arr = []
-    for x in range(10):
-        row = []
-        for y in range(10):
-            row.append("-")
-        arr.append(row)
-
-    playing_field = pd.DataFrame(
-                      data=arr,
-                      index=[
-                          '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
-                          ],
-                      columns=[
-                          'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'
-                          ])
-    return playing_field
-
-
-# Remove this, if not needed for "hardcoded" pc coords
-ship_coords = {
-                4: [['5', 'b'], ['5', 'c'], ['5', 'd'], ['5', 'e']],
-                3: [['1', 'j'], ['2', 'j'], ['3', 'j'], ['9', 'a'],
-                    ['9', 'b'], ['9', 'c']],
-                2: [['1', 'c'], ['2', 'c'], ['3', 'g'], ['3', 'h'],
-                    ['7', 'f'], ['8', 'f']],
-                1: [['1', 'a'], ['6', 'i'], ['9', 'g'], ['9', 'i']]
-                }
-
-
-# test = build_playing_field()
-# serialize_board(ship_coords, "gunhild", "other_board")
-player_boards("pc")
+def logg_game(winner, loser, turns):
+    with open("saves/logg.csv", "a", newline='') as f:
+        csv.writer(f).writerow((winner, loser, turns))
+        print("done")

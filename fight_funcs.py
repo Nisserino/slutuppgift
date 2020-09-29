@@ -4,9 +4,18 @@ import random
 
 
 class Game():
+    """Holds the 'game' contained, keeping check of who's playing
+    What the turn-counter is, when someone has won, and if you're playing
+    vs a human or pc
+    also contains all actions you can make, such as shoot, or see hp
+    args:
+    board1 : [pandas.Dataframe] : player1s board
+    board2 : [pandas.Dataframe] : player2s board (unless pve)
+    pvp : [bool] : True if pvp, False if pve
+    """
     def __init__(self, board_1, board_2, pvp):
-        display_1 = fh.build_playing_field()
-        display_2 = fh.build_playing_field()
+        display_1 = f.build_playing_field()
+        display_2 = f.build_playing_field()
         self.players = [board_1, board_2]
         self.display_boards = [display_1, display_2]
         self.turn = 1
@@ -14,6 +23,7 @@ class Game():
         self.hp = [20, 20]
         self.game_over = False
 
+    # See who shot
     def shoot_who(self, prompt, arg):
         coord = f.coord_format(arg)
         if "1" in prompt:
@@ -21,6 +31,7 @@ class Game():
         else:
             self.check_shot(0, coord)  # -//-
 
+    # Make sure hit coords are correct, and that it wasn't shot already
     def check_shot(self, player, coord):
         try:
             target = self.players[player].loc[coord[0], coord[1]]
@@ -34,9 +45,10 @@ class Game():
                 "You probably wrote the coords badly\nTry again."
                 )
 
+    # Check what kind of hit it was
     def check_hit(self, player, coord):
-        if self.hit(player, coord):
-            self.check_afloat(player, coord)
+        if self.hit(player, coord):  # Hit or miss
+            self.check_afloat(player, coord)  # Hit or sink
         else:
             print("Miss!")
             self.players[player].loc[coord[0], coord[1]] = "o"
@@ -44,6 +56,7 @@ class Game():
             self.turn_over()
         self.show_boards()
 
+    # Check if the shot was a hit or a miss
     def hit(self, player_num, coord):
         coord = self.players[player_num].loc[coord[0], coord[1]]
         if coord.isdigit():
@@ -52,6 +65,7 @@ class Game():
         else:
             return False
 
+    # Start of sunk-check, if check_boat returns True, it is sunk
     def check_afloat(self, player, coord):
         if self.check_boat(coord, self.players[player]):
             self.players[player].loc[coord[0], coord[1]] = "X"
@@ -63,6 +77,7 @@ class Game():
             self.display_boards[player].loc[coord[0], coord[1]] = "x"
             print("Ship is hit, but still afloat!")
 
+    # Get shipsize to help the next func
     def check_boat(self, hit_coord, board):
         # Get shipsize, if ship is a 1, it has sunk (return True)
         if board.loc[hit_coord[0], hit_coord[1]] == "1":
@@ -74,6 +89,8 @@ class Game():
         elif board.loc[hit_coord[0], hit_coord[1]] == "4":
             return self.find_boat([hit_coord], board, 4)
 
+    # Send hit coord to find adjacant, get adjacant ship pieces back
+    # Check all ship pieces untill their len == shipsize, check if boat is dead
     def find_boat(self, hit_coord, board, ship_size):
         ship_coords = []
         for coord in hit_coord:
@@ -84,21 +101,22 @@ class Game():
                 boat_coords.append(self.find_adjacant(coord, board))
             for lists in boat_coords:
                 for coord in lists:
-                    if coord not in ship_coords:
+                    if (coord not in ship_coords):
                         ship_coords.append(coord)
         return self.boat_dead(ship_coords, board)
 
+    # Find all adjacant pieces of boat from a coord.
     def find_adjacant(self, coord, board):
         hits = []
         check = ["2", "3", "4", "x"]
-        lindex, lolumns = f.list_ind_col(board)
-        i_start = lindex.index(coord[0])
-        c_start = lolumns.index(coord[1])
+        lindex, lolumns = f.list_ind_col(board)  # [index], [columns] in lists
+        i_start = lindex.index(coord[0])  # Start of index from coord
+        c_start = lolumns.index(coord[1])  # Start of columns from coord
         try:
-            if board.loc[lindex[i_start - 1], lolumns[c_start]] in check:
-                hits.append([lindex[i_start - 1], lolumns[c_start]])
-            if board.loc[lindex[i_start], lolumns[c_start - 1]] in check:
-                hits.append([lindex[i_start], lolumns[c_start - 1]])
+            if board.loc[lindex[abs(i_start - 1)], lolumns[c_start]] in check:
+                hits.append([lindex[abs(i_start - 1)], lolumns[c_start]])
+            if board.loc[lindex[i_start], lolumns[abs(c_start - 1)]] in check:
+                hits.append([lindex[i_start], lolumns[abs(c_start - 1)]])
             if board.loc[lindex[i_start + 1], lolumns[c_start]] in check:
                 hits.append([lindex[i_start + 1], lolumns[c_start]])
             if board.loc[lindex[i_start], lolumns[c_start + 1]] in check:
@@ -107,6 +125,7 @@ class Game():
             pass
         return hits
 
+    # Check if boat is floating or has sunk, takes a list of whole boats coords
     def boat_dead(self, ship_coords, board):
         sunk = []
         for coord in ship_coords:
@@ -119,6 +138,7 @@ class Game():
         else:
             return False
 
+    # Show the playing fields without the boats visible.
     def show_boards(self):
         print(
             f"-- Player 1 -- \n{self.display_boards[0]}\n"
@@ -139,20 +159,16 @@ class Bot_player:
         self.shootable_coords()  # initializes list of attackable coords
         self.last_hit = str  # Store last hit, unless ship sunk
 
+    # Helper func to initialize bot obj.
     def start(self):
         name = "pc"
         boards = fh.player_boards(name)
         board = boards[random.randint(0, len(boards) - 1)]
         self.board = fh.deserialize(name, board)
 
-    def fire(self):
-        move = random.randint(0, len(self.attackable) - 1)
-        choice = self.attackable[move]
-        del self.attackable[move]
-        return choice
-
+    # Make a list of all allowed coordinates (100)
     def shootable_coords(self):
-        df = fh.build_playing_field()
+        df = f.build_playing_field()
         lolumns, lindex = f.list_ind_col(df)
         self.attackable = []
         for i in lindex:
@@ -161,5 +177,14 @@ class Bot_player:
                 if coord not in self.attackable:
                     self.attackable.append(coord)
 
+    # Shoot at a random coord that is attackable,
+    # remove coord from attackable list
+    def fire(self):
+        move = random.randint(0, len(self.attackable) - 1)
+        choice = self.attackable[move]
+        del self.attackable[move]
+        return choice
+
+    # Extra piece for later
     def smart_shot():
         pass

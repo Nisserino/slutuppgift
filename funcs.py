@@ -2,12 +2,14 @@ import pandas as pd
 import file_handler as fh
 
 
+# Get a list of index and a list of columns in from the board
 def list_ind_col(board):
     lindex = [i for i in board.index]
     lolumns = [i for i in board.columns]
     return lindex, lolumns
 
 
+# Get boat coords and place them in dict, helper for serialization
 def find_coords(board):
     boats = [1, 2, 3, 4]
     lindex, lolumns = list_ind_col(board)
@@ -27,7 +29,8 @@ def find_coords(board):
     return to_json
 
 
-# Reomve boats, in if, check .isdigt() instead
+# Check if there already is a boat adjacant to where you want to place one
+# Takes the list of the whole boat and checks it
 def adjacant_check(coord_list, board):
     lindex, lolumns = list_ind_col(board)
     positions_allowed = True
@@ -107,6 +110,7 @@ def place_boat(coord_list, board, ship_size):
         return False
 
 
+# Board "initializer", calls for the correct number of boats to be placed
 def place_ships(board):
     ship_4(board)
     for _ in range(2):
@@ -186,6 +190,7 @@ def ship_4(board):
         raise
 
 
+# initialize json-file for new player
 def make_player(name):
     if fh.player_exist(name) is False:
         fh.init_player(name)
@@ -194,6 +199,7 @@ def make_player(name):
         print(f"Player: {name} already exists")
 
 
+# Create a board for player X if player X exists
 def make_board(arg):
     player_name, board_name = parse(arg)
     if fh.player_exist(player_name):
@@ -204,15 +210,7 @@ def make_board(arg):
         print("Player does not exist, please create you profile first!")
 
 
-def show_players():
-    pass
-
-
-def show_player_boards(player):
-    pass
-
-
-# For future, if I want playfields bigger than alphabet, len(letter) <= 1
+# Take player input for coords and format it correctly
 def coord_format(*coords):
     list_coords = []
     try:
@@ -239,11 +237,12 @@ def coord_format(*coords):
 def input_handler():
     try:
         usr_in = input("\n: ")
-        return usr_in.lower()
+        return usr_in.lower()  # add.strip?
     except Exception as e:
         print(f"Error: {e}")
 
 
+# Parser for cmd-loops
 def parse(arg):
     try:
         if "," in arg:
@@ -256,6 +255,7 @@ def parse(arg):
         print(f"Error: {e}")
 
 
+# Make an empty board
 def build_playing_field():
     arr = []
     for x in range(10):
