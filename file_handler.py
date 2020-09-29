@@ -22,6 +22,13 @@ def player_exist(name):
 
 
 def init_player(name):
+    """Create a player with user given name
+    Builds the skeleton for the json file so the other funcs
+    Will work properly
+
+    Args:
+        name (str): The name of the player
+    """
     try:
         with open(f"saves/{name}.json", "w") as f:
             base_json = {
@@ -41,6 +48,13 @@ def init_player(name):
 
 
 def serialize_board(coords, name, board_name):
+    """Save a board to given users player-file
+
+    Args:
+        coords (dict): dict with all coords as value, shipsize as key
+        name (str): Name of the player to whom the bord belongs
+        board_name (str): The name you want to save your board as
+    """
     try:
         with open(f"saves/{name}.json", "r") as f:
             player = json.load(f)
@@ -53,6 +67,16 @@ def serialize_board(coords, name, board_name):
 
 
 def deserialize(name, board_name):
+    """Deserialize chosen players chosen bord
+    return a board populated by players ships
+
+    Args:
+        name (str): Name of the player
+        board_name (str): Name of the board
+
+    Returns:
+        pd.dataframe: Board with players ships
+    """
     board = funcs.build_playing_field()
     try:
         with open(f"saves/{name}.json", "r") as f:
@@ -68,6 +92,14 @@ def deserialize(name, board_name):
 
 
 def player_boards(name):
+    """Get all boards chosen player has made
+
+    Args:
+        name (str): Player name
+
+    Returns:
+        list: List of boards player has made
+    """
     try:
         boards = []
         with open(f"saves/{name}.json", "r") as f:
@@ -79,6 +111,7 @@ def player_boards(name):
         print(f"Error: {e}")
 
 
+# Helper func for deserialize
 def board_from_file(board, coord_list, ship_num):
     for coord in coord_list:
         board.loc[coord[0], coord[1]] = ship_num
@@ -86,6 +119,13 @@ def board_from_file(board, coord_list, ship_num):
 
 
 def logg_game(winner, loser, turns):
-    with open("saves/logg.csv", "a", newline='') as f:
+    with open("saves/logg.csv", "a", newline="") as f:
         csv.writer(f).writerow((winner, loser, turns))
         print("done")
+
+
+def show_logg():
+    with open("saves/logg.csv", "r", newline="") as f:
+        reader = csv.reader(f)
+        for line in reader:
+            print(line)

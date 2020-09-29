@@ -29,9 +29,16 @@ def find_coords(board):
     return to_json
 
 
-# Check if there already is a boat adjacant to where you want to place one
-# Takes the list of the whole boat and checks it
 def adjacant_check(coord_list, board):
+    """Check if there are any boats adjacant to all coords in coord_list
+
+    Args:
+        coord_list (list): List of the coords for the boat you want to place
+        board (pd.datafram): The board you are trying to make at the moment
+
+    Returns:
+        bool: Returns True if boat can be placed otherwise return False
+    """
     lindex, lolumns = list_ind_col(board)
     positions_allowed = True
     boats = [1, 2, 3, 4]
@@ -70,8 +77,8 @@ def board_check(coord_list, board, ship_size):
         bool: if boat has any unallowed coords, False is returned
     """
     lindex, lolumns = list_ind_col(board)
-    coord1 = coord_list[0]  # numbers
-    coord2 = coord_list[1]  # letter
+    coord1 = coord_list[0]
+    coord2 = coord_list[1]
     positions_allowed = False
     boat = []
     if coord1[0] == coord2[0]:
@@ -123,15 +130,22 @@ def place_ships(board):
     return board
 
 
+"""
+Ship_1-4 Will call the relevant functions to
+take input for ship, check if it's allowed to be placed
+and then place it
+"""
+
+
 def ship_1(board):
     print(board)
     print("\nWhat position would you like to add ship of size 1 to?")
     try:
         coord = coord_format(input_handler())
-        if board.loc[coord[0], coord[1]] == "-":
+        if adjacant_check([coord], board):
             board.loc[coord[0], coord[1]] = 1
         else:
-            print("There is already a ship there.")
+            print("There is a ship in the way.")
             ship_1(board)
     except KeyError:
         print("Couldn't find that in the coordinate system\nTry again.")
@@ -237,7 +251,7 @@ def coord_format(*coords):
 def input_handler():
     try:
         usr_in = input("\n: ")
-        return usr_in.lower()  # add.strip?
+        return usr_in.lower()
     except Exception as e:
         print(f"Error: {e}")
 

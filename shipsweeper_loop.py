@@ -36,6 +36,10 @@ class Start_menue(cmd.Cmd):
         pvp(arg)
         Pvp_loop().cmdloop()
 
+    def do_show_logg(self, arg):
+        'Prints the statistics for previous games'
+        fh.show_logg()
+
     def do_quit(self, arg):
         'Exit the game'
         return True
@@ -72,9 +76,6 @@ class Pvp_loop(cmd.Cmd):
         self.after_move_check()
         return self.game_over()
 
-    def do_test(self, arg):
-        print(self.players)
-
     def do_hp(self, arg):
         'Show remaining hp for both players'
         print(
@@ -94,14 +95,14 @@ class Pvp_loop(cmd.Cmd):
     def game_over(self):
         if self.game.game_over:
             if "2" in self.prompt:
-                players = [self.players[1], self.players[0]]
+                players = self.players[::-1]
             else:
                 players = self.players
             End_screen(players, self.game).cmdloop()
             return True
 
     def do_quit(self, arg):
-        'Exit'
+        'Exit, game will not be logged'
         return True
 
 
@@ -148,7 +149,7 @@ class Pve_loop(cmd.Cmd):
     def game_over(self):
         if self.game.game_over:
             if "2" in self.prompt:
-                players = [self.players[1], self.players[0]]
+                players = self.players[::-1]
             else:
                 players = self.players
             End_screen(players, self.game).cmdloop()
