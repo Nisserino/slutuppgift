@@ -50,11 +50,11 @@ If you on the other hand want to play against the computer, you can start right 
 
 >Play against the computer
 
-Write ```start_game_pve ```_```(your name),(board name)```_  
+Write ```start_pve ```_```(your name),(board name)```_  
 
 >Play against a friend on the same machine
 
-Write ```start_game_pvp ```_```(your name),(board name),(your friends name),(his/hers board name)```_  
+Write ```start_pvp ```_```(your name),(board name),(your friends name),(his/hers board name)```_  
 
 Now you have started playing battle ship! I mean shipsweeper.  
 If you're playing against the bot, the program shoots on it's own, and whenever you can take an action, it is your turn.  
